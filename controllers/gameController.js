@@ -24,21 +24,21 @@ gameController.post("/create",isAuthorized, async (req, res) => {
     }
   });
 
-//   gameController.get("/catalog", async (req, res) => {
-//     try {
-//       const cryptos = await gameService.getAll();
-//       res.render("catalog", {
-//         title: "Crypto Catalog",
-//         cryptos,
-//       });
-//     } catch (err) {
-//         const errors = errorHelper(err)
-//         res.render('catalog',{
-//           title : 'Crypto Catalog',
-//           errors
-//         });
-//     }
-//   });
+  gameController.get("/catalog", async (req, res) => {
+    try {
+      const games = await gameService.getAll();
+      res.render("catalog", {
+        title: "Game Catalog",
+        games,
+      });
+    } catch (err) {
+        const errors = errorHelper(err)
+        res.render('catalog',{
+          title : 'Game Catalog',
+          errors
+        });
+    }
+  });
 
 //   gameController.get("/:id/details", async (req, res) => {
 //     try {
@@ -114,7 +114,7 @@ gameController.post("/create",isAuthorized, async (req, res) => {
 //       console.log(err);
 //       const errors = errorHelper(err)
 //       res.render("edit", {
-//         title: "Crypto Edit",
+//         title: "Game Edit",
 //         errors
 //       });
 //     }
