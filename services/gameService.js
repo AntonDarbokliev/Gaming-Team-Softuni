@@ -24,8 +24,8 @@ async function getById(id) {
   return Game.findById(id).lean().populate('owner').populate('boughtBy');
 }
 
-async function find(location) {
-  return Game.find({ location: { $regex: location, $options: "i" } }).lean();
+async function find(name) {
+  return Game.find({ name: { $regex: name, $options: "i" } }).lean();
 }
 
 async function edit(id, data) {

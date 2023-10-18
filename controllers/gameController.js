@@ -1,4 +1,5 @@
 const { isAuthorized } = require("../middlewares/authMiddleware.js");
+const Game = require("../models/Game.js");
 const gameService = require("../services/gameService.js");
 const { errorHelper } = require("../utils/errorHelpers.js");
 // const isOwner = require("../utils/validationHelper.js");
@@ -154,5 +155,46 @@ gameController.get("/:id/delete", isAuthorized, async (req, res) => {
     });
   }
 });
+
+gameController.get('/search',async (req,res) => {
+    try {
+        const games = await gameService.getAll()
+        res.render('search',{
+            title : 'Search Games',
+            games
+        })
+    } catch (err) {
+        const errors = errorHelper(err);
+        res.render("home", {
+          errors,
+        });
+    }
+})
+
+gameController.post('/search',async (req,res) => {
+    try {
+        const gameName = req.body.name
+        const gamePlatform = req.body.platform
+        let games = await gameService.getAll()
+        if(gameName && gamePlatform ){ 
+        games = await Game.find({ name: { $regex: name, $options: "i" },platform : { $regex : gamePlatform}, $options : 'i' }).lean();
+        }else if (gameName){
+            games = await gameService.find(gameName)
+        }else if (gamePlatform){
+            games = await Game.find({platform : { $regex : gamePlatform, $options : 'i'} }).lean();
+        }
+        console.log(req.body);
+        res.render('search',{
+            title : 'Search Games',
+            games
+
+        })
+    } catch (err) {
+        const errors = errorHelper(err);
+        res.render("home", {
+          errors,
+        });
+    }
+})
 
 module.exports = gameController;
