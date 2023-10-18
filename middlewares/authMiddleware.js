@@ -13,7 +13,7 @@ async function auth(req, res, next) {
         next();
       } catch (err) {
         res.clearCookie("auth");
-        res.redirect("/user/login");
+        res.redirect("/users/login");
       }
 }else{
     next()
@@ -22,7 +22,7 @@ async function auth(req, res, next) {
 
 async function isAuthorized(req,res,next){
     if(!req.user){
-        res.redirect('/user/login')
+        res.redirect('/users/login')
         return
     }
     next()

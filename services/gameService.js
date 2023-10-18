@@ -21,7 +21,7 @@ async function getAll() {
 }
 
 async function getById(id) {
-  return Game.findById(id).lean().populate('owner').populate('buys');
+  return Game.findById(id).lean().populate('owner').populate('boughtBy');
 }
 
 async function find(location) {
@@ -37,7 +37,7 @@ async function del(id) {
 }
 
 async function buy(gameId,userId){
-  return Game.findByIdAndUpdate(gameId,{$push : {buys : userId}})    // CHANGE FUNCTION NAME AND PROPERTIES ACCORDING TO THE TASK
+  return Game.findByIdAndUpdate(gameId,{$push : {boughtBy : userId}})    // CHANGE FUNCTION NAME AND PROPERTIES ACCORDING TO THE TASK
 }
 
 async function getLastThree(){

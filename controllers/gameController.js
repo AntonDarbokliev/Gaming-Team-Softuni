@@ -40,117 +40,116 @@ gameController.post("/create",isAuthorized, async (req, res) => {
     }
   });
 
-//   gameController.get("/:id/details", async (req, res) => {
-//     try {
-//       const crypto = await gameService.getById(req.params.id);
-//       const isOwner = req.user?._id == crypto.owner._id
-//       let hasBought = false;
-//       const parsedBuys = JSON.parse(JSON.stringify(crypto.buys))
-//       const idArr = parsedBuys.map(x => x._id)
-//       if (idArr.includes(req.user?._id)) {           //CHANGE PROPERTIES ACCORDING TO THE TASK
-//           hasBought = true
-//       }
+  gameController.get("/:id/details", async (req, res) => {
+    try {
+      const game = await gameService.getById(req.params.id);
+      const isOwner = req.user?._id == game.owner._id
+      let hasBought = false;
+      const parsedBuys = JSON.parse(JSON.stringify(game.boughtBy))
+      const idArr = parsedBuys.map(x => x._id)
+      if (idArr.includes(req.user?._id)) {           //CHANGE PROPERTIES ACCORDING TO THE TASK
+          hasBought = true
+      }
   
-//     //   const votesString = parsedVotes.map(x => x.email).join(', ')
+    //   const votesString = parsedVotes.map(x => x.email).join(', ')
   
-//       res.render("details", {
-//         title: "Details",
-//         crypto,
-//         isOwner,
-//         hasBought,
-//         // votesString,
-//         parsedBuys
-//       });
-//     } catch (err) {
-//       const errors = errorHelper(err)
-//       res.render('details',{
-//         title : 'Details',
-//         errors
-//       });
-//     }
-//   });
+      res.render("details", {
+        title: "Details",
+        game,
+        isOwner,
+        hasBought,
+        // votesString,
+        parsedBuys
+      });
+    } catch (err) {
+      const errors = errorHelper(err)
+      res.render('details',{
+        title : 'Details',
+        errors
+      });
+    }
+  });
 
-//   gameController.get('/:id/buy', isAuthorized,async (req,res) => {
-//     const cryptoId = req.params.id
-//     const userId = req.user._id 
-//   try{
-//     const crypto = await gameService.getById(cryptoId);
-//     let hasBought = false;
-//     const parsedBuys = JSON.parse(JSON.stringify(crypto.buys))
-//     const idArr = parsedBuys.map(x => x._id)
-//     if (idArr.includes(req.user?._id)) {           
-//         hasBought = true
-//     }
-//     if(hasBought){
-//         throw new Error('You cannot buy more coins')
-//     }
+  gameController.get('/:id/buy', isAuthorized,async (req,res) => {
+    const gameId = req.params.id
+    const userId = req.user._id 
+  try{
+    const game = await gameService.getById(gameId);
+    let hasBought = false;
+    const parsedBuys = JSON.parse(JSON.stringify(game.boughtBy))
+    const idArr = parsedBuys.map(x => x._id)
+    if (idArr.includes(req.user?._id)) {           
+        hasBought = true
+    }
+    if(hasBought){
+        throw new Error('You have already bought this game')
+    }
 
-//     await gameService.buy(cryptoId,userId)
-//     res.redirect(`/crypto/${cryptoId}/details`)
-//   }catch(err){
-//     const errors = errorHelper(err)
-//     res.render('details',{
-//       title : 'Details',
-//       errors,
-//     })
-//   }
-//   })
+    await gameService.buy(gameId,userId)
+    res.redirect(`/games/${gameId}/details`)
+  }catch(err){
+    const errors = errorHelper(err)
+    res.render('home',{
+      title : 'Home',
+      errors,
+    })
+  }
+  })
 
 
 
-//   gameController.get("/:id/edit",isAuthorized,async (req, res) => {
-//     try {
-//       const userId = req.user.id;
-//       const cryptoId = req.params.id
-//       const crypto = await gameService.getById(cryptoId)
+  gameController.get("/:id/edit",isAuthorized,async (req, res) => {
+    try {
+      const cryptoId = req.params.id
+      const game = await gameService.getById(cryptoId)
 
-//       isOwner(crypto.owner,userId)
+      const isOwner = req.user?._id == game.owner._id
+      if(!isOwner) throw new Error('You are not the owner of this game')
 
-//       res.render("edit", {
-//         title: "Edit",
-//         crypto
-//       });
-//     } catch (err) {
-//       console.log(err);
-//       const errors = errorHelper(err)
-//       res.render("edit", {
-//         title: "Game Edit",
-//         errors
-//       });
-//     }
-//   });
+      res.render("edit", {
+        title: "Edit",
+        game
+      });
+    } catch (err) {
+      const errors = errorHelper(err)
+      res.render("edit", {
+        title: "Game Edit",
+        errors
+      });
+    }
+  });
   
-//   gameController.post("/:id/edit",isAuthorized, async (req, res) => {
-//     const cryptoData = req.body
-//     const userId = req.user.id;
-//     const cryptoId = req.params.id
-//     const crypto = await gameService.getById(cryptoId)
+  gameController.post("/:id/edit",isAuthorized, async (req, res) => {
+    const gameData = req.body
+    const cryptoId = req.params.id
+    const game = await gameService.getById(cryptoId)
 
-//     isOwner(crypto.owner,userId)
+    const isOwner = req.user?._id == game.owner._id
+    if(!isOwner) throw new Error('You are not the owner of this game')
 
-//     try {
-//       await gameService.edit(id,cryptoData)
-//       res.redirect(`/crypto/${id}/details`)
+    try {
+      await gameService.edit(game._id,gameData)
+      res.redirect(`/games/${game._id}/details`)
      
-//     } catch (err) {
-//       const errors = errorHelper(err)
-//       res.render("edit", {
-//         title: "Edit",
-//         errors
-//       });
-//     }
-//   });
+    } catch (err) {
+      const errors = errorHelper(err)
+      res.render("edit", {
+        title: "Edit",
+        errors
+      });
+    }
+  });
 
 //   gameController.get('/:id/delete',isAuthorized, async (req,res) => {
 //     const userId = req.user.id;
 //     const cryptoId = req.params.id
-//     const crypto = await gameService.getById(cryptoId)
+//     const game = await gameService.getById(cryptoId)
 
     
 //     try{
-//     isOwner(crypto.owner,userId)
+//     isOwner(game.owner,userId)
 //     await gameService.del(cryptoId)
-//     res.redirect('/crypto/catalog')
+//     res.redirect('/games/catalog')
 //   }catch(err){
 //     const errors = errorHelper(err)
 //       res.render("home", {
